@@ -1,46 +1,47 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   /************  HTML ELEMENTS  ************/
   // View divs
-  const quizView = document.querySelector("#quizView");
-  const endView = document.querySelector("#endView");
+  const quizView = document.querySelector('#quizView');
+  const endView = document.querySelector('#endView');
 
   // Quiz view elements
-  const progressBar = document.querySelector("#progressBar");
-  const questionCount = document.querySelector("#questionCount");
-  const questionContainer = document.querySelector("#question");
-  const choiceContainer = document.querySelector("#choices");
-  const nextButton = document.querySelector("#nextButton");
+  const progressBar = document.querySelector('#progressBar');
+  const questionCount = document.querySelector('#questionCount');
+  const questionContainer = document.querySelector('#question');
+  const choiceContainer = document.querySelector('#choices');
+  const nextButton = document.querySelector('#nextButton');
+  const resetQuizButton = document.querySelector('#restartButton');
 
   // End view elements
-  const resultContainer = document.querySelector("#result");
+  const resultContainer = document.querySelector('#result');
 
   /************  SET VISIBILITY OF VIEWS  ************/
 
   // Show the quiz view (div#quizView) and hide the end view (div#endView)
-  quizView.style.display = "block";
-  endView.style.display = "none";
+  quizView.style.display = 'block';
+  endView.style.display = 'none';
 
   /************  QUIZ DATA  ************/
 
   // Array with the quiz questions
   const questions = [
-    new Question("What is 2 + 2?", ["3", "4", "5", "6"], "4", 1),
+    new Question('What is 2 + 2?', ['3', '4', '5', '6'], '4', 1),
     new Question(
-      "What is the capital of France?",
-      ["Miami", "Paris", "Oslo", "Rome"],
-      "Paris",
+      'What is the capital of France?',
+      ['Miami', 'Paris', 'Oslo', 'Rome'],
+      'Paris',
       1
     ),
     new Question(
-      "Who created JavaScript?",
-      ["Plato", "Brendan Eich", "Lea Verou", "Bill Gates"],
-      "Brendan Eich",
+      'Who created JavaScript?',
+      ['Plato', 'Brendan Eich', 'Lea Verou', 'Bill Gates'],
+      'Brendan Eich',
       2
     ),
     new Question(
-      "What is the mass–energy equivalence equation?",
-      ["E = mc^2", "E = m*c^2", "E = m*c^3", "E = m*c"],
-      "E = mc^2",
+      'What is the mass–energy equivalence equation?',
+      ['E = mc^2', 'E = m*c^2', 'E = m*c^3', 'E = m*c'],
+      'E = mc^2',
       3
     ),
     // Add more questions here
@@ -59,11 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Convert the time remaining in seconds to minutes and seconds, and pad the numbers with zeros if needed
   const minutes = Math.floor(quiz.timeRemaining / 60)
     .toString()
-    .padStart(2, "0");
-  const seconds = (quiz.timeRemaining % 60).toString().padStart(2, "0");
+    .padStart(2, '0');
+  const seconds = (quiz.timeRemaining % 60).toString().padStart(2, '0');
 
   // Display the time remaining in the time remaining container
-  const timeRemainingContainer = document.getElementById("timeRemaining");
+  const timeRemainingContainer = document.getElementById('timeRemaining');
   timeRemainingContainer.innerText = `${minutes}:${seconds}`;
 
   // Show first question
@@ -75,7 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /************  EVENT LISTENERS  ************/
 
-  nextButton.addEventListener("click", nextButtonHandler);
+  nextButton.addEventListener('click', nextButtonHandler);
+  resetQuizButton.addEventListener('click', resetQuizButtonHandler);
 
   /************  FUNCTIONS  ************/
 
@@ -89,8 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    questionContainer.innerText = "";
-    choiceContainer.innerHTML = "";
+    questionContainer.innerText = '';
+    choiceContainer.innerHTML = '';
 
     const question = quiz.getQuestion();
     question.shuffleChoices();
@@ -106,17 +108,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }`;
 
     question.choices.forEach((choice, index) => {
-      const radioInput = document.createElement("input");
-      radioInput.type = "radio";
-      radioInput.name = "choice";
+      const radioInput = document.createElement('input');
+      radioInput.type = 'radio';
+      radioInput.name = 'choice';
       radioInput.value = choice;
       radioInput.id = `choice${index}`;
 
-      const label = document.createElement("label");
+      const label = document.createElement('label');
       label.htmlFor = `choice${index}`;
       label.innerText = choice;
 
-      const lineBreak = document.createElement("br");
+      const lineBreak = document.createElement('br');
 
       choiceContainer.appendChild(radioInput);
       choiceContainer.appendChild(label);
@@ -143,20 +145,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
       showQuestion();
     } else {
-      alert("Please select an answer before proceeding.");
+      alert('Please select an answer before proceeding.');
     }
   }
 
   function showResults() {
-    // YOUR CODE HERE:
-    //
-    // 1. Hide the quiz view (div#quizView)
-    quizView.style.display = "none";
+    quizView.style.display = 'none';
+    endView.style.display = 'flex';
+    resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${quiz.questions.length} correct answers!`; // This value is hardcoded as a placeholder
+  }
 
-    // 2. Show the end view (div#endView)
-    endView.style.display = "flex";
-
-    // 3. Update the result container (div#result) inner text to show the number of correct answers out of total questions
-    resultContainer.innerText = `You scored 1 out of 1 correct answers!`; // This value is hardcoded as a placeholder
+  function resetQuizButtonHandler() {
+    quizView.style.display = 'flex';
+    endView.style.display = 'none';
+    quiz.currentQuestionIndex = 0;
+    quiz.correctAnswers = 0;
+    quiz.shuffleQuestions();
+    showQuestion();
   }
 });
