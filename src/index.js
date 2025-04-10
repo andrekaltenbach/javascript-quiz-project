@@ -52,20 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Create a new Quiz instance object
   const quiz = new Quiz(questions, quizDuration, quizDuration);
+
   // Shuffle the quiz questions
   quiz.shuffleQuestions();
 
   /************  SHOW INITIAL CONTENT  ************/
 
-  // Convert the time remaining in seconds to minutes and seconds, and pad the numbers with zeros if needed
-  const minutes = Math.floor(quiz.timeRemaining / 60)
-    .toString()
-    .padStart(2, '0');
-  const seconds = (quiz.timeRemaining % 60).toString().padStart(2, '0');
-
-  // Display the time remaining in the time remaining container
-  const timeRemainingContainer = document.getElementById('timeRemaining');
-  timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+  // display timer
+  displayTimer();
 
   // Show first question
   showQuestion();
@@ -73,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /************  TIMER  ************/
 
   let timer;
+  quizTimer();
 
   /************  EVENT LISTENERS  ************/
 
@@ -84,6 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // showQuestion() - Displays the current question and its choices
   // nextButtonHandler() - Handles the click on the next button
   // showResults() - Displays the end view and the quiz results
+  // resetQuizButtonHandler() - Handles the click on the Restart Quiz button
+  // quizTimer() - set timer interval
+  // clearTimer() - clear timer
+  // displayTimer() - display and update timer
 
   function showQuestion() {
     if (quiz.hasEnded()) {
@@ -150,9 +149,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function showResults() {
+    clearTimer();
     quizView.style.display = 'none';
     endView.style.display = 'flex';
-    resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${quiz.questions.length} correct answers!`; // This value is hardcoded as a placeholder
+    resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${quiz.questions.length} correct answers!`;
   }
 
   function resetQuizButtonHandler() {
@@ -160,7 +160,40 @@ document.addEventListener('DOMContentLoaded', () => {
     endView.style.display = 'none';
     quiz.currentQuestionIndex = 0;
     quiz.correctAnswers = 0;
+    quiz.timeRemaining = quizDuration;
+    displayTimer();
     quiz.shuffleQuestions();
     showQuestion();
+    clearTimer();
+    quizTimer();
+  }
+
+  function quizTimer() {
+    if (!timer) {
+      timer = setInterval(() => {
+        quiz.timeRemaining -= 1;
+        displayTimer();
+        if (quiz.timeRemaining === 0) {
+          showResults();
+        }
+      }, 1000);
+    }
+  }
+
+  function clearTimer() {
+    clearInterval(timer);
+    timer = null;
+  }
+
+  function displayTimer() {
+    // Convert the time remaining in seconds to minutes and seconds, and pad the numbers with zeros if needed
+    const minutes = Math.floor(quiz.timeRemaining / 60)
+      .toString()
+      .padStart(2, '0');
+    const seconds = (quiz.timeRemaining % 60).toString().padStart(2, '0');
+    // Display the time remaining in the time remaining container
+    document.getElementById(
+      'timeRemaining'
+    ).innerText = `${minutes}:${seconds}`;
   }
 });
